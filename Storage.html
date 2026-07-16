@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Storage Module Command Reference</title>
+  <style>
+    :root { color-scheme: light dark; --bg:#f7f7f4; --fg:#1c1d20; --panel:#fff; --line:#cfd4d9; --muted:#5d6470; --accent:#15616d; }
+    @media (prefers-color-scheme:dark) { :root { --bg:#15171a; --fg:#eceff3; --panel:#1f2328; --line:#343a42; --muted:#aab2bd; --accent:#4fb3bf; } }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:1200px; margin:auto; padding:34px 22px 56px; }
+    h1 { margin:0 0 8px; font-size:clamp(2rem,5vw,3.2rem); }
+    .summary { color:var(--muted); margin-bottom:24px; }
+    input { width:100%; max-width:520px; margin:0 0 18px; padding:10px 12px; border:1px solid var(--line); border-radius:7px; background:var(--panel); color:var(--fg); }
+    table { width:100%; border-collapse:collapse; background:var(--panel); }
+    th,td { padding:10px 12px; border:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { background:color-mix(in srgb,var(--accent),transparent 86%); }
+    th:first-child { width:24%; } th:nth-child(2) { width:31%; }
+    code { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+    footer { margin-top:20px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Storage Module</h1>
+    <p class="summary">Command reference generated from <code>src/main.cpp</code>. Arguments are shown in the order consumed by the module interpreter.</p>
+    <label for="filter">Filter commands</label><br>
+    <input id="filter" type="search" placeholder="Type a command, argument, or description">
+    <table>
+      <thead><tr><th>Command</th><th>Arguments</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>Init</code></td><td><code>Name: string</code></td><td>Initializes the module and loads its default plugin.</td></tr>
+        <tr><td><code>Debug</code></td><td><code>Value: string</code></td><td>Enables or disables diagnostic logging for the module and active plugin.</td></tr>
+        <tr><td><code>Set_Paths</code></td><td><code>Resources: string</code></td><td>Sets the root Appeal resources path used by the module.</td></tr>
+        <tr><td><code>Open</code></td><td><code>Name: string</code></td><td>Requests the module to open.</td></tr>
+        <tr><td><code>Close</code></td><td><code>Name: string</code></td><td>Requests the module to close.</td></tr>
+        <tr><td><code>Use</code></td><td><code>Name: string</code></td><td>Requests the module to use.</td></tr>
+        <tr><td><code>Read</code></td><td><code>File: string</code></td><td>Requests the module to read.</td></tr>
+        <tr><td><code>Write</code></td><td><code>Name: string, File: string</code></td><td>Requests the module to write.</td></tr>
+        <tr><td><code>Exists</code></td><td><code>File: string</code></td><td>Requests the module to exists.</td></tr>
+        <tr><td><code>Delete</code></td><td><code>File: string</code></td><td>Requests the module to delete.</td></tr>
+        <tr><td><code>Set</code></td><td><code>Key: string, Value: string</code></td><td>Requests the module to set.</td></tr>
+        <tr><td><code>Get</code></td><td><code>Key: string</code></td><td>Requests the module to get.</td></tr>
+        <tr><td><code>Insert</code></td><td><code>Collection: string, Key: string, Value: string</code></td><td>Requests the module to insert.</td></tr>
+        <tr><td><code>Update</code></td><td><code>Collection: string, Key: string, Value: string</code></td><td>Advances or refreshes the module state for the current update cycle.</td></tr>
+        <tr><td><code>Find</code></td><td><code>Collection: string, Key: string</code></td><td>Requests the module to find.</td></tr>
+        <tr><td><code>List</code></td><td><code>Collection: string</code></td><td>Requests the module to list.</td></tr>
+        <tr><td><code>Remove</code></td><td><code>Collection: string, Key: string</code></td><td>Requests the module to remove.</td></tr>
+        <tr><td><code>Begin</code></td><td><code>none</code></td><td>Begins a storage transaction.</td></tr>
+        <tr><td><code>Commit</code></td><td><code>none</code></td><td>Commits the active storage transaction.</td></tr>
+        <tr><td><code>Rollback</code></td><td><code>none</code></td><td>Rolls back the active storage transaction.</td></tr>
+        <tr><td><code>Backup</code></td><td><code>File: string</code></td><td>Requests the module to backup.</td></tr>
+        <tr><td><code>Restore</code></td><td><code>File: string</code></td><td>Requests the module to restore.</td></tr>
+        <tr><td><code>Export</code></td><td><code>File: string</code></td><td>Requests the module to export.</td></tr>
+        <tr><td><code>Import</code></td><td><code>File: string</code></td><td>Requests the module to import.</td></tr>
+        <tr><td><code>Save</code></td><td><code>Name: string</code></td><td>Saves the current data using the active backend.</td></tr>
+        <tr><td><code>Load</code></td><td><code>Name: string</code></td><td>Loads data using the active backend.</td></tr>
+      </tbody>
+    </table>
+    <footer>26 commands documented.</footer>
+  </main>
+  <script>
+    const filter = document.getElementById('filter');
+    const rows = [...document.querySelectorAll('tbody tr')];
+    filter.addEventListener('input', () => {
+      const query = filter.value.toLowerCase();
+      rows.forEach(row => row.hidden = !row.textContent.toLowerCase().includes(query));
+    });
+  </script>
+</body>
+</html>

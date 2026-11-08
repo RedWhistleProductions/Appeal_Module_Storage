@@ -18,3 +18,5 @@ dist/
 .DS_Store
 Thumbs.db
 
+
+/Appeal_SQLite_Storage/

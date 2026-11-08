@@ -1,5 +1,10 @@
 #include "Plugin.h"
 #include "Data_Source.h"
+#include <stdexcept>
+
+void (*Create_Level)(std::string Name);
+void (*Save_Level)(std::string Name, std::string Snapshot);
+std::string (*Load_Level)(std::string Name);
 
 Plugin Module;
 bool Module_Debug = false;
@@ -29,6 +34,11 @@ void (*Export)(std::string File);
 void (*Import)(std::string File);
 void (*Save)(std::string Name);
 void (*Load)(std::string Name);
+void (*Execute_SQL)(std::string SQL);
+std::string (*Try_SQL)(std::string SQL);
+void (*Open_Memory)(std::string Name);
+std::string (*Get_Field)(std::string Table, std::string Key_Column, std::string Key, std::string Field);
+void (*Set_Field)(std::string Table, std::string Key_Column, std::string Key, std::string Field, std::string Value);
 
 template<typename T>
 void Assign(std::string Name, T &Function)
@@ -39,6 +49,9 @@ void Assign(std::string Name, T &Function)
 extern "C" void Init(std::string Name)
 {
     Module.Load(Name);
+    Assign("Create_Level", Create_Level);
+    Assign("Save_Level", Save_Level);
+    Assign("Load_Level", Load_Level);
     Assign("Debug", Debug);
     Assign("Set_Paths", Set_Paths);
     Assign("Open", Open);
@@ -64,6 +77,11 @@ extern "C" void Init(std::string Name)
     Assign("Import", Import);
     Assign("Save", Save);
     Assign("Load", Load);
+    Assign("Execute_SQL", Execute_SQL);
+    Assign("Try_SQL", Try_SQL);
+    Assign("Open_Memory", Open_Memory);
+    Assign("Get_Field", Get_Field);
+    Assign("Set_Field", Set_Field);
 }
 
 extern "C" void Interpreter(Data_Source *Data)
@@ -71,11 +89,64 @@ extern "C" void Interpreter(Data_Source *Data)
     std::string Command;
     *Data >> Command;
 
-    if(Command == "Init")
+    if(Command == "Create_Level" || Command == "Save_Level" || Command == "Load_Level")
+    {
+        std::string Name; *Data >> Name;
+        if(Command == "Create_Level") {
+            if(!Create_Level) throw std::runtime_error("Storage plugin does not support Create_Level");
+            Create_Level(Name);
+        } else if(Command == "Save_Level") {
+            std::string Snapshot; *Data >> Snapshot;
+            if(!Save_Level) throw std::runtime_error("Storage plugin does not support Save_Level");
+            Save_Level(Name, Snapshot);
+        } else {
+            if(!Load_Level) throw std::runtime_error("Storage plugin does not support Load_Level");
+            Data->Return_Value(Load_Level(Name));
+        }
+    }
+    else if(Command == "Init")
     {
         std::string Name;
         *Data >> Name;
         Init(Name);
+    }
+    else if(Command == "Get_Field" || Command == "Set_Field")
+    {
+        std::string Table, Key_Column, Key, Field, Value;
+        *Data >> Table;
+        *Data >> Key_Column;
+        *Data >> Key;
+        *Data >> Field;
+        if(Command == "Get_Field")
+        {
+            if(!Get_Field) throw std::runtime_error("Storage plugin does not support Get_Field");
+            Data->Return_Value(Get_Field(Table, Key_Column, Key, Field));
+        }
+        else
+        {
+            *Data >> Value;
+            if(!Set_Field) throw std::runtime_error("Storage plugin does not support Set_Field");
+            Set_Field(Table, Key_Column, Key, Field, Value);
+        }
+    }
+    else if(Command == "Open_Memory")
+    {
+        std::string Name; *Data >> Name;
+        if(!Open_Memory) throw std::runtime_error("Storage plugin does not support Open_Memory");
+        Open_Memory(Name);
+    }
+    else if(Command == "Try_SQL")
+    {
+        std::string SQL; *Data >> SQL;
+        if(!Try_SQL) throw std::runtime_error("Storage plugin does not support Try_SQL");
+        Data->Return_Value(Try_SQL(SQL));
+    }
+    else if(Command == "Execute_SQL")
+    {
+        std::string SQL;
+        *Data >> SQL;
+        if(!Execute_SQL) throw std::runtime_error("Storage plugin does not support Execute_SQL");
+        Execute_SQL(SQL);
     }
     else if(Command == "Debug")
     {
@@ -241,4 +312,9 @@ extern "C" void Interpreter(Data_Source *Data)
     {
         if(Module_Debug) std::cout << "\tError: " << Command << " not found in Storage Dictionary" << std::endl;
     }
+}
+
+extern "C" void Shutdown()
+{
+    Module.Unload();
 }

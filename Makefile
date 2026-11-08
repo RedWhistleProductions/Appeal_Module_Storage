@@ -3,11 +3,11 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 CXX ?= g++
 	CXXFLAGS = -shared -fPIC -Wall
-	TARGET = Storage.so
+	TARGET = Appeal_Module_Storage.so
 else
 CXX ?= g++
 	CXXFLAGS = -shared -Wall
-	TARGET = Storage.dll
+	TARGET = Appeal_Module_Storage.dll
 endif
 
 SRCS = ./src/main.cpp ./src/Data_Source.cpp ./src/Plugin.cpp
@@ -19,7 +19,7 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(OBJDIR)/%.o: ./src/%.cpp
+$(OBJDIR)/%.o: ./src/%.cpp $(wildcard ./src/*.h)
 	@mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
